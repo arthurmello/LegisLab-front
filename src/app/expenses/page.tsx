@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/chart";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { WalletIcon, SearchIcon, FilterIcon } from "lucide-react";
+import { WalletIcon, SearchIcon } from "lucide-react";
 import { BarChart, Bar, XAxis, CartesianGrid, YAxis, ResponsiveContainer } from "recharts";
 
 export default function ExpensesPage() {
@@ -33,6 +33,23 @@ export default function ExpensesPage() {
     { category: "Correios", amount: 230000 },
     { category: "Telefonia", amount: 180000 },
     { category: "Material de Escritório", amount: 150000 },
+  ];
+
+  const expensesByParliamentarian = [
+    { name: "Maria Silva", party: "PT-SP", amount: 450000, avatarId: 1 },
+    { name: "João Santos", party: "PSDB-MG", amount: 380000, avatarId: 2 },
+    { name: "Ana Oliveira", party: "PSD-RJ", amount: 360000, avatarId: 3 },
+    { name: "Pedro Costa", party: "MDB-RS", amount: 340000, avatarId: 4 },
+    { name: "Lucia Ferreira", party: "UNIÃO-BA", amount: 320000, avatarId: 5 },
+  ];
+
+  const monthlyExpenses = [
+    { month: "Jan", amount: 2500000 },
+    { month: "Fev", amount: 2300000 },
+    { month: "Mar", amount: 2700000 },
+    { month: "Abr", amount: 2400000 },
+    { month: "Mai", amount: 2600000 },
+    { month: "Jun", amount: 2800000 },
   ];
 
   const formatCurrency = (value: number) => {
@@ -53,46 +70,13 @@ export default function ExpensesPage() {
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <div className="relative flex-1">
-          <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar parlamentar..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <Select value={yearFilter} onValueChange={setYearFilter}>
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="Ano" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="2024">2024</SelectItem>
-            <SelectItem value="2023">2023</SelectItem>
-            <SelectItem value="2022">2022</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={monthFilter} onValueChange={setMonthFilter}>
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="Mês" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="1">Janeiro</SelectItem>
-            <SelectItem value="2">Fevereiro</SelectItem>
-            <SelectItem value="3">Março</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Gastos por Categoria</CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[400px] w-full">
+            <ChartContainer className="h-[400px] w-full" config={{}}>
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart
                   data={expensesByCategory}
@@ -102,21 +86,50 @@ export default function ExpensesPage() {
                 >
                   <CartesianGrid horizontal={false} />
                   <XAxis type="number" />
-                  <YAxis
-                    type="category"
-                    dataKey="category"
-                    width={150} // Adjust based on category name length
-                    tick={{ fontSize: 12 }}
-                  />
-                  <ChartTooltip
-                    content={<ChartTooltipContent />}
-                    formatter={(value: number) => formatCurrency(value)}
-                  />
-                  <Bar
-                    dataKey="amount"
-                    fill="hsl(var(--chart-1))"
-                    radius={[0, 4, 4, 0]}
-                  />
+                  <YAxis type="category" dataKey="category" width={150} tick={{ fontSize: 12 }} />
+                  <ChartTooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Bar dataKey="amount" fill="hsl(var(--chart-1))" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Parlamentares por Gasto</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[400px]">
+              {expensesByParliamentarian.map((mp, index) => (
+                <div key={index} className="flex items-center space-x-4 mb-4 p-2 hover:bg-muted/50 rounded-lg">
+                  <Avatar>
+                    <AvatarImage src={`https://i.pravatar.cc/150?img=${mp.avatarId}`} alt={mp.name} />
+                    <AvatarFallback>{mp.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="font-medium">{mp.name}</div>
+                    <div className="text-sm text-muted-foreground">{mp.party}</div>
+                  </div>
+                  <div className="font-medium">{formatCurrency(mp.amount)}</div>
+                </div>
+              ))}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Evolução Mensal dos Gastos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer className="h-[300px]" config={{}}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monthlyExpenses} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="month" />
+                  <ChartTooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Bar dataKey="amount" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
