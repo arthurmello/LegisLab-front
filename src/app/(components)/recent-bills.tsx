@@ -65,10 +65,10 @@ export function RecentBills() {
                   <Badge
                     variant={
                       bill.status === "Aprovado"
-                        ? "success"
+                        ? "default"
                         : bill.status === "Em votação"
-                          ? "warning"
-                          : "secondary"
+                          ? "secondary"
+                          : "outline"
                     }
                     id={`73qg6q_${index}`}
                   >

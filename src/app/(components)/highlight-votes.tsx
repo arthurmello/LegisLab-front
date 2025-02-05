@@ -110,10 +110,10 @@ export function HighlightVotes() {
                         <Badge
                           variant={
                             vote.result === "Aprovado"
-                              ? "success"
-                              : vote.result === "Em votação"
-                                ? "warning"
-                                : "secondary"
+                            ? "default" // or "secondary", "destructive", etc.
+                            : vote.result === "Em votação"
+                            ? "secondary"
+                            : "outline"
                           }
                           id={`gjt85a_${index}`}
                         >

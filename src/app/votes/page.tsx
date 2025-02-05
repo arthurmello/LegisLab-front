@@ -145,105 +145,105 @@ export default function VotesPage() {
         <div className="space-y-4">
           {votes.map((vote, index) => (
             <Collapsible
-            key={vote.id}
-            open={expandedVote === vote.id}
-            onOpenChange={() => setExpandedVote(expandedVote === vote.id ? null : vote.id)}
-            id={`y5rzbk_${index}`}
-          >
-            <Card className="overflow-hidden transition-all duration-200 hover:shadow-md" id={`77pwz5_${index}`}>
-              
-              {/* ❌ Don't use CollapsibleTrigger inside a button */}
-              <div className="w-full cursor-pointer" onClick={() => setExpandedVote(expandedVote === vote.id ? null : vote.id)}>
-                <CardContent className="p-4" id={`cece5f_${index}`}>
-                  <div className="flex items-center justify-between mb-2" id={`cl9bjg_${index}`}>
-                    <div className="flex items-center space-x-2" id={`ce8hqu_${index}`}>
-                      <span className="font-semibold" id={`pnrifp_${index}`}>
-                        {vote.id}
+              key={vote.id}
+              open={expandedVote === vote.id}
+              onOpenChange={() => setExpandedVote(expandedVote === vote.id ? null : vote.id)}
+              id={`y5rzbk_${index}`}
+            >
+              <Card className="overflow-hidden transition-all duration-200 hover:shadow-md" id={`77pwz5_${index}`}>
+
+                {/* ❌ Don't use CollapsibleTrigger inside a button */}
+                <div className="w-full cursor-pointer" onClick={() => setExpandedVote(expandedVote === vote.id ? null : vote.id)}>
+                  <CardContent className="p-4" id={`cece5f_${index}`}>
+                    <div className="flex items-center justify-between mb-2" id={`cl9bjg_${index}`}>
+                      <div className="flex items-center space-x-2" id={`ce8hqu_${index}`}>
+                        <span className="font-semibold" id={`pnrifp_${index}`}>
+                          {vote.id}
+                        </span>
+                        <Badge
+                          variant={
+                            vote.status === "Aprovado"
+                              ? "default"
+                              : vote.status === "Em votação"
+                                ? "secondary"
+                                : "outline"
+                          }
+                          id={`a938u8_${index}`}
+                        >
+                          {vote.status}
+                        </Badge>
+                      </div>
+                      <span className="text-sm text-muted-foreground" id={`85vaws_${index}`}>
+                        {new Date(vote.date).toLocaleDateString()}
                       </span>
-                      <Badge
-                        variant={
-                          vote.status === "Aprovado"
-                            ? "success"
-                            : vote.status === "Em votação"
-                            ? "warning"
-                            : "secondary"
-                        }
-                        id={`a938u8_${index}`}
-                      >
-                        {vote.status}
-                      </Badge>
                     </div>
-                    <span className="text-sm text-muted-foreground" id={`85vaws_${index}`}>
-                      {new Date(vote.date).toLocaleDateString()}
-                    </span>
-                  </div>
-          
-                  <p className="text-sm mb-3" id={`uoa63c_${index}`}>
-                    {vote.title}
-                  </p>
-          
-                  <div className="grid grid-cols-3 gap-2 text-sm" id={`g81rmw_${index}`}>
-                    <Dialog id={`wtlftl_${index}`}>
-                      <DialogTrigger className="text-green-600 hover:underline cursor-pointer flex items-center" id={`xbpaby_${index}`}>
-                        <UserIcon className="h-4 w-4 mr-1" id={`mlof3t_${index}`} />
-                        A favor: {vote.votes.favor.count}
-                      </DialogTrigger>
-                      <VotersList voters={vote.votes.favor.parliamentarians} title="Votos a Favor" type="favor" />
-                    </Dialog>
-          
-                    <Dialog id={`rkgdnq_${index}`}>
-                      <DialogTrigger className="text-red-600 hover:underline cursor-pointer flex items-center" id={`kw6ohg_${index}`}>
-                        <UserIcon className="h-4 w-4 mr-1" id={`hmgpum_${index}`} />
-                        Contra: {vote.votes.against.count}
-                      </DialogTrigger>
-                      <VotersList voters={vote.votes.against.parliamentarians} title="Votos Contra" type="against" />
-                    </Dialog>
-          
-                    <Dialog id={`mx34ao_${index}`}>
-                      <DialogTrigger className="text-muted-foreground hover:underline cursor-pointer flex items-center" id={`pt4him_${index}`}>
-                        <UserIcon className="h-4 w-4 mr-1" id={`faf7nv_${index}`} />
-                        Abstenção: {vote.votes.abstain.count}
-                      </DialogTrigger>
-                      <VotersList voters={vote.votes.abstain.parliamentarians} title="Abstenções" type="abstain" />
-                    </Dialog>
-                  </div>
-          
-                  <div className="flex justify-end mt-2" id={`nvipl6_${index}`}>
-                    {expandedVote === vote.id ? <ChevronUpIcon className="h-4 w-4" id={`7xmtky_${index}`} /> : <ChevronDownIcon className="h-4 w-4" id={`kvarss_${index}`} />}
-                  </div>
-                </CardContent>
-              </div>
-          
-              <CollapsibleContent id={`ilv8zv_${index}`}>
-                <CardContent className="p-4 bg-muted/50 border-t" id={`gcvkuu_${index}`}>
-                  <div className="space-y-4" id={`kwgtzc_${index}`}>
-                    <div id={`f9upg1_${index}`}>
-                      <h4 className="font-semibold mb-2" id={`p1ws7f_${index}`}>Resumo</h4>
-                      <p className="text-sm" id={`pd1gi0_${index}`}>{vote.details.summary}</p>
+
+                    <p className="text-sm mb-3" id={`uoa63c_${index}`}>
+                      {vote.title}
+                    </p>
+
+                    <div className="grid grid-cols-3 gap-2 text-sm" id={`g81rmw_${index}`}>
+                      <Dialog>
+                        <DialogTrigger className="text-green-600 hover:underline cursor-pointer flex items-center">
+                          <UserIcon className="h-4 w-4 mr-1" />
+                          A favor: {vote.votes.favor.count}
+                        </DialogTrigger>
+                        <VotersList voters={vote.votes.favor.parliamentarians} title="Votos a Favor" type="favor" />
+                      </Dialog>
+
+                      <Dialog>
+                        <DialogTrigger className="text-red-600 hover:underline cursor-pointer flex items-center" id={`kw6ohg_${index}`}>
+                          <UserIcon className="h-4 w-4 mr-1" id={`hmgpum_${index}`} />
+                          Contra: {vote.votes.against.count}
+                        </DialogTrigger>
+                        <VotersList voters={vote.votes.against.parliamentarians} title="Votos Contra" type="against" />
+                      </Dialog>
+
+                      <Dialog>
+                        <DialogTrigger className="text-muted-foreground hover:underline cursor-pointer flex items-center" id={`pt4him_${index}`}>
+                          <UserIcon className="h-4 w-4 mr-1" id={`faf7nv_${index}`} />
+                          Abstenção: {vote.votes.abstain.count}
+                        </DialogTrigger>
+                        <VotersList voters={vote.votes.abstain.parliamentarians} title="Abstenções" type="abstain" />
+                      </Dialog>
                     </div>
-                    <div id={`z1a4um_${index}`}>
-                      <h4 className="font-semibold mb-2" id={`6f14zb_${index}`}>Pontos Principais</h4>
-                      <ul className="list-disc list-inside text-sm space-y-1" id={`vz1fju_${index}`}>
-                        {vote.details.mainPoints.map((point, index) => (
-                          <li key={index} id={`k0y02p_${index}`}>{point}</li>
-                        ))}
-                      </ul>
+
+                    <div className="flex justify-end mt-2" id={`nvipl6_${index}`}>
+                      {expandedVote === vote.id ? <ChevronUpIcon className="h-4 w-4" id={`7xmtky_${index}`} /> : <ChevronDownIcon className="h-4 w-4" id={`kvarss_${index}`} />}
                     </div>
-                    <div className="grid grid-cols-2 gap-4" id={`w93vxi_${index}`}>
-                      <div id={`w2x439_${index}`}>
-                        <h4 className="font-semibold mb-2" id={`t1lqcm_${index}`}>Impacto</h4>
-                        <p className="text-sm" id={`p3ijta_${index}`}>{vote.details.impact}</p>
+                  </CardContent>
+                </div>
+
+                <CollapsibleContent id={`ilv8zv_${index}`}>
+                  <CardContent className="p-4 bg-muted/50 border-t" id={`gcvkuu_${index}`}>
+                    <div className="space-y-4" id={`kwgtzc_${index}`}>
+                      <div id={`f9upg1_${index}`}>
+                        <h4 className="font-semibold mb-2" id={`p1ws7f_${index}`}>Resumo</h4>
+                        <p className="text-sm" id={`pd1gi0_${index}`}>{vote.details.summary}</p>
                       </div>
-                      <div id={`cis2qw_${index}`}>
-                        <h4 className="font-semibold mb-2" id={`xzohwq_${index}`}>Próximos Passos</h4>
-                        <p className="text-sm" id={`4m8c9y_${index}`}>{vote.details.nextSteps}</p>
+                      <div id={`z1a4um_${index}`}>
+                        <h4 className="font-semibold mb-2" id={`6f14zb_${index}`}>Pontos Principais</h4>
+                        <ul className="list-disc list-inside text-sm space-y-1" id={`vz1fju_${index}`}>
+                          {vote.details.mainPoints.map((point, index) => (
+                            <li key={index} id={`k0y02p_${index}`}>{point}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4" id={`w93vxi_${index}`}>
+                        <div id={`w2x439_${index}`}>
+                          <h4 className="font-semibold mb-2" id={`t1lqcm_${index}`}>Impacto</h4>
+                          <p className="text-sm" id={`p3ijta_${index}`}>{vote.details.impact}</p>
+                        </div>
+                        <div id={`cis2qw_${index}`}>
+                          <h4 className="font-semibold mb-2" id={`xzohwq_${index}`}>Próximos Passos</h4>
+                          <p className="text-sm" id={`4m8c9y_${index}`}>{vote.details.nextSteps}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
           ))}
         </div>
       </ScrollArea>

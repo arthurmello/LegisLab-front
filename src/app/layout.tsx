@@ -1,74 +1,53 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Sidebar } from "./(components)/sidebar";
-import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom"; // Import Router
 import { Banner } from "./(components)/banner";
+import { usePathname } from "next/navigation"; // ✅ Use Next.js routing
 import "./globals.css";
-import HomePage from "./page"; // Import your HomePage component
-import Dashboard from "./dashboard/page"; // Import your Dashboard component
-import ParliamentariansPage from "./parliamentarians/page"
-import PropositionsPage from "./propositions/page"
-import VotesPage from "./votes/page"
-import ExpensesPage from "./expenses/page"
-import AlertsPage from "./alerts/page"
-import AccountPage from "./account/page"
-// Import other pages as needed
+import HomePage from "./page";
+import Dashboard from "./dashboard/page";
+import ParliamentariansPage from "./parliamentarians/page";
+import PropositionsPage from "./propositions/page";
+import VotesPage from "./votes/page";
+import ExpensesPage from "./expenses/page";
+import AlertsPage from "./alerts/page";
+import AccountPage from "./account/page";
 
-// Custom hook for media query
-const useMediaQuery = (query) => {
+// ✅ Define TypeScript type for query
+const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
-    const listener = () => setMatches(media.matches);
-    media.addListener(listener);
-    return () => media.removeListener(listener);
-  }, [matches, query]);
+    setMatches(media.matches);
+
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, [query]);
 
   return matches;
 };
 
-export default function Layout({ children }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const pathname = usePathname(); // ✅ Get current route in Next.js
 
   return (
-    <Router>
-      <html>
-      <title>LegisLab</title>
-      <head>
-      <link rel="shortcut icon" href="/favicon.ico" />
-      </head>
-        <body>
-          <div className="flex flex-col h-screen bg-background">
-            {!isMobile && <Banner />}
-            <div className="flex flex-1 overflow-hidden">
-
-              <Sidebar />
-
-              <main className="flex-1 overflow-y-auto p-8">
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/parliamentarians" element={<ParliamentariansPage />} />
-                  <Route path="/propositions" element={<PropositionsPage />} />
-                  <Route path="/votes" element={<VotesPage />} />
-                  <Route path="/expenses" element={<ExpensesPage />} />
-                  <Route path="/alerts" element={<AlertsPage />} />
-                  <Route path="/account" element={<AccountPage />} />
-                  
-                  {/* Add other routes here */}
-                </Routes>
-                <Outlet /> {/* This will render the selected component based on the route */}
-              </main>
-            </div>
+    <html>
+      <body>
+        <div className="flex flex-col h-screen bg-background">
+          {!isMobile && <Banner />}
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar />
+            <main className="flex-1 overflow-y-auto p-8">
+              {/* ✅ Automatically render children based on Next.js routing */}
+              {children}
+            </main>
           </div>
-        </body>
-      </html>
-    </Router>
-
+        </div>
+      </body>
+    </html>
   );
 }

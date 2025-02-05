@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation"; // ✅ Use this instead of window.location.pathname
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,23 +19,15 @@ import {
 } from "lucide-react";
 
 export function Sidebar() {
-  const [location, setLocation] = useState<{ pathname: string }>({ pathname: "" });
+  const pathname = usePathname(); // ✅ Get the current route
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setLocation({ pathname: window.location.pathname });
-    }
-
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
     checkScreenSize();
     window.addEventListener("resize", checkScreenSize);
-
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
@@ -76,12 +69,12 @@ export function Sidebar() {
       >
         <div className="px-3 py-2">
           <div className="space-y-1">
-            {routes.map((route, index) => {
-              const isActive = location.pathname === route.href;
+            {routes.map((route) => {
+              const isActive = pathname === route.href;
               return (
                 <Link
                   key={route.href}
-                  to={route.href}
+                  href={route.href} // ✅ Use `href` instead of `to`
                   className={cn(
                     "flex items-center p-3 text-sm font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition whitespace-nowrap",
                     isActive && "text-primary bg-primary/10"
@@ -103,7 +96,10 @@ export function Sidebar() {
           </div>
         </div>
         <div className="mt-auto px-3 py-2">
-          <Link href="/help" className="flex items-center p-3 text-sm font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition whitespace-nowrap">
+          <Link
+            href="/help" // ✅ Corrected href
+            className="flex items-center p-3 text-sm font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition whitespace-nowrap"
+          >
             <HelpCircleIcon className="h-5 w-5 min-w-[20px]" />
             <span
               className={cn("ml-3 transition-opacity", {

@@ -272,10 +272,10 @@ export default function PropositionsPage() {
                           <Badge
                             variant={
                               proposition.status === "Aprovado"
-                                ? "success"
+                                ? "default"
                                 : proposition.status === "Em votação"
-                                  ? "warning"
-                                  : "secondary"
+                                  ? "secondary"
+                                  : "outline"
                             }
                             id={`5imy14_${index}`}
                           >

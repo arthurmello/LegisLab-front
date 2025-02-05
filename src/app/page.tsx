@@ -1,14 +1,14 @@
-'use client'; // Add this directive to mark the file as a client component
+"use client";
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation"; // ✅ Use Next.js router
 
 export default function HomePage() {
-  const navigate = useNavigate();
+  const router = useRouter(); // ✅ Next.js router
 
   useEffect(() => {
-    navigate("/dashboard"); // Redirect to the dashboard route
-  }, [navigate]);
+    router.push("/dashboard"); // ✅ Redirect to the dashboard
+  }, [router]);
 
-  return null; // Return null since the redirect happens immediately
+  return null; // The component doesn't render anything
 }
