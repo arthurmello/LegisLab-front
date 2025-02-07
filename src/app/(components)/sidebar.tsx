@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // ✅ Use this instead of window.location.pathname
+import { useRouter, usePathname } from "next/navigation"; // ✅ Use this instead of window.location.pathname
+import { supabase } from "@/lib/supabaseClient"; // ✅ Import Supabase client
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +21,7 @@ import {
 
 export function Sidebar() {
   const pathname = usePathname(); // ✅ Get the current route
+  const router = useRouter(); 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,6 +32,16 @@ export function Sidebar() {
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut(); // ✅ Logout from Supabase
+      localStorage.removeItem("access_token"); // ✅ Clear local storage
+      router.push("/"); // ✅ Redirect to home page
+    } catch (error) {
+      console.error("Erro ao sair:", error);
+    }
+  };
 
   const routes = [
     { label: "Dashboard", icon: HomeIcon, href: "/" },
@@ -110,14 +122,13 @@ export function Sidebar() {
               Ajuda
             </span>
           </Link>
-          <Button variant="ghost" className="w-full mt-2 justify-start" onClick={() => isMobile && setIsMenuOpen(false)}>
+          <Button
+            variant="ghost"
+            className="w-full mt-2 justify-start"
+            onClick={handleLogout} // ✅ Logout handler
+          >
             <LogOutIcon className="h-5 w-5 min-w-[20px]" />
-            <span
-              className={cn("ml-3 transition-opacity", {
-                "opacity-0 w-0": !isExpanded && !isMenuOpen,
-                "opacity-100": isExpanded || isMenuOpen,
-              })}
-            >
+            <span className={`ml-3 ${isExpanded || isMenuOpen ? "opacity-100" : "opacity-0 w-0"}`}>
               Sair
             </span>
           </Button>

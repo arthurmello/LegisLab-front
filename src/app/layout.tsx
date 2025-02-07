@@ -9,7 +9,11 @@ import { AuthProvider } from "./context/AuthContext";
 
 // ✅ Utility function to check if sidebar should be hidden
 const shouldHideSidebar = (pathname: string) => {
-  return pathname === "/home" || pathname.startsWith("/login");
+  return pathname === "/home" || pathname.startsWith("/auth");
+};
+
+const shouldHideHeader = (pathname: string) => {
+  return pathname === "/home" || pathname.startsWith("/auth");
 };
 
 // ✅ Define TypeScript type for query
@@ -38,7 +42,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <title>LegisLab</title>
         <body>
           <div className="flex flex-col h-screen bg-background">
-            {!isMobile && <Banner />}
+            {!shouldHideHeader(pathname) && !isMobile && <Banner />}
             <div className="flex flex-1 overflow-hidden">
               {/* ✅ Only show Sidebar if the page is NOT /home or /auth/* */}
               {!shouldHideSidebar(pathname) && <Sidebar />}

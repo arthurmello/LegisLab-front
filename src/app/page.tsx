@@ -1,14 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation"; // ✅ Use Next.js router
+import { useRouter } from "next/navigation";
+import { useAuth } from "./context/AuthContext";
 
 export default function HomePage() {
-  const router = useRouter(); // ✅ Next.js router
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    router.push("/home"); // ✅ Redirect to the dashboard
-  }, [router]);
+    if (!loading) {
+      if (user) {
+        router.push("/home"); // ✅ Redirect to dashboard if logged in
+      } else {
+        router.push("/auth"); // ✅ Redirect to auth page if not logged in
+      }
+    }
+  }, [user, loading, router]);
 
-  return null; // The component doesn't render anything
+  return <p>Loading...</p>; // Show a loading state while checking auth
 }
