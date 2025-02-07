@@ -13,6 +13,7 @@ import VotesPage from "./votes/page";
 import ExpensesPage from "./expenses/page";
 import AlertsPage from "./alerts/page";
 import AccountPage from "./account/page";
+import { AuthProvider } from "./context/AuthContext";
 
 // ✅ Define TypeScript type for query
 const useMediaQuery = (query: string) => {
@@ -35,19 +36,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname(); // ✅ Get current route in Next.js
 
   return (
-    <html>
-      <body>
-        <div className="flex flex-col h-screen bg-background">
-          {!isMobile && <Banner />}
-          <div className="flex flex-1 overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 overflow-y-auto p-8">
-              {/* ✅ Automatically render children based on Next.js routing */}
-              {children}
-            </main>
+    <AuthProvider>
+      <html>
+        <title>LegisLab</title>
+        <body>
+          <div className="flex flex-col h-screen bg-background">
+            {!isMobile && <Banner />}
+            <div className="flex flex-1 overflow-hidden">
+              <Sidebar />
+              <main className="flex-1 overflow-y-auto p-8">
+                {/* ✅ Automatically render children based on Next.js routing */}
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
-      </body>
-    </html>
+        </body>
+      </html>
+    </AuthProvider>
   );
 }
