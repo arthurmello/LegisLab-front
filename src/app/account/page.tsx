@@ -91,13 +91,6 @@ export default function AccountPage() {
               </div>
             </div>
           )}
-
-          {/* ✅ Logout Button */}
-          <div className="pt-6 border-t">
-            <Button className="w-full bg-red-500 hover:bg-red-600 text-white" onClick={signOut}>
-              Sair da Conta
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>

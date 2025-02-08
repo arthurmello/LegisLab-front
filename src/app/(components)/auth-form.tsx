@@ -52,9 +52,9 @@ export function AuthForm() {
         refresh_token: data.refresh_token, // If available
       });
     
-      if (sessionError) {
-        console.error("❌ Error setting session in Supabase:", sessionError);
-      }
+      // if (sessionError) {
+      //   console.error("❌ Error setting session in Supabase:", sessionError);
+      // }
     
       router.push("/dashboard"); // ✅ Redirect after login
     }

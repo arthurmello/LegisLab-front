@@ -44,7 +44,7 @@ export function Sidebar() {
   };
 
   const routes = [
-    { label: "Dashboard", icon: HomeIcon, href: "/" },
+    { label: "Dashboard", icon: HomeIcon, href: "/dashboard" },
     { label: "Parlamentares", icon: Users2Icon, href: "/parliamentarians" },
     { label: "Proposições", icon: FileTextIcon, href: "/propositions" },
     { label: "Votações", icon: VoteIcon, href: "/votes" },

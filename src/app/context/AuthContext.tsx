@@ -27,6 +27,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
+    // Add refresh token function
+    const refreshSession = async (session: Session) => {
+        const expiryTime = new Date(session.expires_at! * 1000);
+        const timeUntilExpiry = expiryTime.getTime() - Date.now();
+        
+        // Refresh if token expires in less than 60 seconds
+        if (timeUntilExpiry < 60000) {
+            console.log("🔄 Refreshing session token...");
+            const { data: { session: newSession }, error } = await supabase.auth.refreshSession();
+            if (error) {
+                console.error("❌ Error refreshing token:", error);
+                return null;
+            }
+            return newSession;
+        }
+        return session;
+    };
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -46,11 +64,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
                 console.log("✅ Active session detected:", session);
     
-                setUser({
-                    id: session.user.id,
-                    email: session.user.email ?? "",
-                    plan: session.user.user_metadata?.plan || "free",
-                });
+                // Add token refresh check after getting session
+                if (session) {
+                    const refreshedSession = await refreshSession(session);
+                    if (refreshedSession && refreshedSession.user) {
+                        setUser({
+                            id: refreshedSession.user.id,
+                            email: refreshedSession.user.email ?? "",
+                            plan: refreshedSession.user.user_metadata?.plan || "free",
+                        });
+                    }
+                }
             } catch (err) {
                 console.error("❌ Unexpected error in fetchUser:", err);
                 setUser(null);
@@ -61,21 +85,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
         fetchUser();
     
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+        // Set up periodic token refresh
+        const refreshInterval = setInterval(async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                await refreshSession(session);
+            }
+        }, 50000); // Check every 50 seconds
+    
+        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
             console.log(`🔄 Auth event: ${event}`, session);
             
             if (session?.user) {
-                setUser({
-                    id: session.user.id,
-                    email: session.user.email ?? "",
-                    plan: session.user.user_metadata?.plan || "free",
-                });
+                // Refresh token if needed before setting user
+                const refreshedSession = await refreshSession(session);
+                if (refreshedSession) {
+                    setUser({
+                        id: refreshedSession.user.id,
+                        email: refreshedSession.user.email ?? "",
+                        plan: refreshedSession.user.user_metadata?.plan || "free",
+                    });
+                }
             } else {
                 setUser(null);
             }
         });
     
-        return () => authListener.subscription.unsubscribe();
+        return () => {
+            authListener.subscription.unsubscribe();
+            clearInterval(refreshInterval);
+        };
     }, []);
 
     const signOut = async () => {

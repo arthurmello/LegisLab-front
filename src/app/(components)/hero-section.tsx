@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "lucide-react";
+import Link from "next/link";
 
 export function HeroSection() {
   return (
@@ -19,12 +20,14 @@ export function HeroSection() {
         parlamentares com análises em tempo real e alertas personalizados.
       </p>
       <div className="space-x-4">
-        <Button
-          className="bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 px-8 py-6 text-lg"
-        >
-          Comece agora
-          <ArrowRightIcon className="ml-2 h-5 w-5" />
-        </Button>
+        <Link href="/auth">
+          <Button
+            className="bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 px-8 py-6 text-lg"
+          >
+            Comece agora
+            <ArrowRightIcon className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
       </div>
     </div>
   );
