@@ -4,6 +4,9 @@ LegisLab is a modern web application for monitoring and analyzing activities in 
 Right now, it's in development, so the data is fake and some features are not implemented yet.
 In the future, it will be linked to the real data from the Brazilian National Congress.
 
+![LegisLab Screenshot](public/assets/screenshot.png)
+
+
 ## Features
 
 - **Real-time Monitoring**: Track legislative activities and voting sessions as they happen
@@ -28,12 +31,6 @@ In the future, it will be linked to the real data from the Brazilian National Co
 
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
 ```
 
 3. Set up environment variables:
@@ -46,12 +43,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
