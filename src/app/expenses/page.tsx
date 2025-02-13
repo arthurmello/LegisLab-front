@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -20,37 +20,43 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { WalletIcon, SearchIcon } from "lucide-react";
 import { BarChart, Bar, XAxis, CartesianGrid, YAxis, ResponsiveContainer } from "recharts";
 
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function ExpensesPage() {
   const [yearFilter, setYearFilter] = useState("2024");
   const [monthFilter, setMonthFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [expensesByCategory, setExpensesByCategory] = useState([]);
+  const [expensesByParliamentarian, setExpensesByParliamentarian] = useState([]);
+  const [monthlyExpenses, setMonthlyExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const expensesByCategory = [
-    { category: "Verba de Gabinete", amount: 1250000 },
-    { category: "Auxílio Moradia", amount: 850000 },
-    { category: "Passagens Aéreas", amount: 620000 },
-    { category: "Combustível", amount: 450000 },
-    { category: "Correios", amount: 230000 },
-    { category: "Telefonia", amount: 180000 },
-    { category: "Material de Escritório", amount: 150000 },
-  ];
+  useEffect(() => {
+    async function fetchExpenses() {
+      try {
+        const categoryRes = await fetch(`${API_URL}/despesas/categoria`);
+        const categoryData = await categoryRes.json();
+        console.log(categoryData);
+        setExpensesByCategory(categoryData);
 
-  const expensesByParliamentarian = [
-    { name: "Maria Silva", party: "PT-SP", amount: 450000, avatarId: 1 },
-    { name: "João Santos", party: "PSDB-MG", amount: 380000, avatarId: 2 },
-    { name: "Ana Oliveira", party: "PSD-RJ", amount: 360000, avatarId: 3 },
-    { name: "Pedro Costa", party: "MDB-RS", amount: 340000, avatarId: 4 },
-    { name: "Lucia Ferreira", party: "UNIÃO-BA", amount: 320000, avatarId: 5 },
-  ];
+        const parliamentarianRes = await fetch(`${API_URL}/despesas/parlamentares`);
+        const parliamentarianData = await parliamentarianRes.json();
+        setExpensesByParliamentarian(parliamentarianData);
+        console.log(parliamentarianData);
 
-  const monthlyExpenses = [
-    { month: "Jan", amount: 2500000 },
-    { month: "Fev", amount: 2300000 },
-    { month: "Mar", amount: 2700000 },
-    { month: "Abr", amount: 2400000 },
-    { month: "Mai", amount: 2600000 },
-    { month: "Jun", amount: 2800000 },
-  ];
+        const monthlyRes = await fetch(`${API_URL}/despesas/total`);
+        const monthlyData = await monthlyRes.json();
+        setMonthlyExpenses(monthlyData);
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchExpenses();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -86,9 +92,9 @@ export default function ExpensesPage() {
                 >
                   <CartesianGrid horizontal={false} />
                   <XAxis type="number" />
-                  <YAxis type="category" dataKey="category" width={150} tick={{ fontSize: 12 }} />
+                  <YAxis type="category" dataKey="tipo" width={150} tick={{ fontSize: 12 }} />
                   <ChartTooltip formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="amount" fill="hsl(var(--chart-1))" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="valor" fill="hsl(var(--chart-1))" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -104,14 +110,14 @@ export default function ExpensesPage() {
               {expensesByParliamentarian.map((mp, index) => (
                 <div key={index} className="flex items-center space-x-4 mb-4 p-2 hover:bg-muted/50 rounded-lg">
                   <Avatar>
-                    <AvatarImage src={`https://i.pravatar.cc/150?img=${mp.avatarId}`} alt={mp.name} />
-                    <AvatarFallback>{mp.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
+                    <AvatarImage src={mp.url_foto} alt={mp.nome} />
+                    <AvatarFallback>{mp.nome.split(" ").map((n: string) => n[0]).join("")}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <div className="font-medium">{mp.name}</div>
-                    <div className="text-sm text-muted-foreground">{mp.party}</div>
+                    <div className="font-medium">{mp.nome}</div>
+                    <div className="text-sm text-muted-foreground">{mp.partido}</div>
                   </div>
-                  <div className="font-medium">{formatCurrency(mp.amount)}</div>
+                  <div className="font-medium">{formatCurrency(mp.valor)}</div>
                 </div>
               ))}
             </ScrollArea>
@@ -127,9 +133,9 @@ export default function ExpensesPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={monthlyExpenses} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid vertical={false} />
-                  <XAxis dataKey="month" />
+                  <XAxis dataKey="mes" />
                   <ChartTooltip formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="amount" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="valor" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>

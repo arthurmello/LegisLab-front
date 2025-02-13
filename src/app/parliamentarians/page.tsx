@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,10 @@ import {
   MailIcon,
   PhoneIcon,
   GlobeIcon,
+  FacebookIcon,
+  YoutubeIcon,
+  InstagramIcon,
+  XIcon,
 } from "lucide-react";
 import {
   Collapsible,
@@ -23,50 +27,34 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function ParliamentariansPage() {
+  const [parliamentarians, setParliamentarians] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedMember, setExpandedMember] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    async function fetchParliamentarians() {
+      try {
+        const res = await fetch(`${API_URL}/parlamentares`);
+        const data = await res.json();
+        console.log(data);
+        setParliamentarians(data);
+      } catch (error) {
+        console.error("Error fetching parlamentares:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchParliamentarians();
+  }, []);
 
-  const parliamentarians = [
-    {
-      id: 1,
-      name: "Maria Silva",
-      party: "PT",
-      state: "SP",
-      role: "Deputada Federal",
-      avatarId: 1,
-      details: {
-        email: "maria.silva@camara.leg.br",
-        phone: "(61) 3215-1234",
-        office: "Anexo IV - Gabinete 123",
-        website: "www.mariasilva.leg.br",
-        committees: ["Comissão de Educação", "Comissão de Direitos Humanos"],
-        bills: 45,
-        attendance: "95%",
-      },
-    },
-    {
-      id: 2,
-      name: "João Santos",
-      party: "PSDB",
-      state: "MG",
-      role: "Deputado Federal",
-      avatarId: 2,
-      details: {
-        email: "joao.santos@camara.leg.br",
-        phone: "(61) 3215-5678",
-        office: "Anexo III - Gabinete 456",
-        website: "www.joaosantos.leg.br",
-        committees: ["Comissão de Finanças", "Comissão de Trabalho"],
-        bills: 32,
-        attendance: "92%",
-      },
-    },
-    // Add more parliamentarians as needed
-  ];
+  if (loading) return <p>Loading...</p>;
 
   const filteredParliamentarians = parliamentarians.filter((member) =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    member.nome.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -110,7 +98,7 @@ export default function ParliamentariansPage() {
                 id={`99g3cf_${index}`}
               >
                 <CollapsibleTrigger className="w-full" id={`n9gzw2_${index}`}>
-                  <CardContent className="p-4" id={`w7zi6p_${index}`}>
+                  <CardContent className="p-4 text-left" id={`w7zi6p_${index}`}>
                     <div
                       className="flex items-center justify-between"
                       id={`uvs98z_${index}`}
@@ -119,32 +107,32 @@ export default function ParliamentariansPage() {
                         className="flex items-center space-x-4"
                         id={`nl4n45_${index}`}
                       >
-                        <Avatar className="h-12 w-12" id={`p4ed5a_${index}`}>
+                        <Avatar className="h-12 w-12 relative" id={`p4ed5a_${index}`}>
                           <AvatarImage
-                            src={`https://i.pravatar.cc/150?img=${member.avatarId}`}
-                            alt={member.name}
+                            src={`${member.url_foto}`}
+                            alt={member.nome}
+                            className="object-cover object-top"
                             id={`1g1o3o_${index}`}
                           />
-
                           <AvatarFallback id={`m11xgg_${index}`}>
-                            {member.name
+                            {member.nome
                               .split(" ")
-                              .map((n) => n[0])
+                              .map((n: string) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div id={`4gtzsu_${index}`}>
                           <h3 className="font-semibold" id={`arudon_${index}`}>
-                            {member.name}
+                            {member.nome}
                           </h3>
                           <div
                             className="flex items-center space-x-2 text-sm text-muted-foreground"
                             id={`1mtxv5_${index}`}
                           >
                             <Badge variant="outline" id={`8920ww_${index}`}>
-                              {member.party}
+                              {member.partido}
                             </Badge>
-                            <span id={`522aji_${index}`}>{member.role}</span>
+                            <span id={`522aji_${index}`}>{member.cargo}</span>
                             <span
                               className="flex items-center"
                               id={`9pv19w_${index}`}
@@ -153,7 +141,7 @@ export default function ParliamentariansPage() {
                                 className="h-3 w-3 mr-1"
                                 id={`g5mo00_${index}`}
                               />
-                              {member.state}
+                              {member.uf}
                             </span>
                           </div>
                         </div>
@@ -183,7 +171,7 @@ export default function ParliamentariansPage() {
                     >
                       <div className="space-y-2" id={`bokw5b_${index}`}>
                         <div
-                          className="flex items-center space-x-2 text-sm"
+                          className="flex items-center space-x-2 text-sm mt-2"
                           id={`79loqv_${index}`}
                         >
                           <MailIcon
@@ -191,7 +179,7 @@ export default function ParliamentariansPage() {
                             id={`e78fae_${index}`}
                           />
                           <span id={`5m8i3o_${index}`}>
-                            {member.details.email}
+                            {member.email}
                           </span>
                         </div>
                         <div
@@ -203,7 +191,7 @@ export default function ParliamentariansPage() {
                             id={`bxnlzl_${index}`}
                           />
                           <span id={`kpfn14_${index}`}>
-                            {member.details.phone}
+                            {member.telefone}
                           </span>
                         </div>
                         <div
@@ -215,36 +203,99 @@ export default function ParliamentariansPage() {
                             id={`mcrxn7_${index}`}
                           />
                           <span id={`1a17aa_${index}`}>
-                            {member.details.office}
+                            {member.gabinete}
                           </span>
                         </div>
                         <div
                           className="flex items-center space-x-2 text-sm"
                           id={`cb8e8j_${index}`}
                         >
-                          <GlobeIcon
-                            className="h-4 w-4"
-                            id={`z0q4yx_${index}`}
-                          />
-                          <span id={`u0690m_${index}`}>
-                            {member.details.website}
-                          </span>
+                          {member.rede_social && member.rede_social.length > 0 ? (
+                            <div className="flex gap-2">
+                              {member.rede_social.map((url: string, socialIndex: number) => {
+                                const socialUrl = url.toLowerCase();
+                                if (socialUrl.includes('twitter.com')) {
+                                  return (
+                                    <a 
+                                      key={socialIndex}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:text-blue-400"
+                                    >
+                                      <XIcon className="h-4 w-4" />
+                                    </a>
+                                  );
+                                } else if (socialUrl.includes('instagram.com')) {
+                                  return (
+                                    <a 
+                                      key={socialIndex}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:text-pink-600"
+                                    >
+                                      <InstagramIcon className="h-4 w-4" />
+                                    </a>
+                                  );
+                                } else if (socialUrl.includes('facebook.com')) {
+                                  return (
+                                    <a 
+                                      key={socialIndex}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:text-blue-600"
+                                    >
+                                      <FacebookIcon className="h-4 w-4" />
+                                    </a>
+                                  );
+                                } else if (socialUrl.includes('youtube.com')) {
+                                  return (
+                                    <a 
+                                      key={socialIndex}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:text-red-600"
+                                    >
+                                      <YoutubeIcon className="h-4 w-4" />
+                                    </a>
+                                  );
+                                } else {
+                                  return (
+                                    <a 
+                                      key={socialIndex}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:text-gray-600"
+                                    >
+                                      <GlobeIcon className="h-4 w-4" />
+                                    </a>
+                                  );
+                                }
+                              })}
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                       <div className="space-y-4" id={`gzt25u_${index}`}>
                         <div id={`a7pd9h_${index}`}>
                           <h4
-                            className="font-medium mb-2"
+                            className="font-medium mb-2 mt-4"
                             id={`zekafa_${index}`}
                           >
+                            
                             Comissões
                           </h4>
+                          
                           <div
                             className="flex flex-wrap gap-2"
                             id={`l8762w_${index}`}
                           >
-                            {member.details.committees.map(
-                              (committee, index) => (
+                            {member.orgaos && member.orgaos.map(
+                              (committee: string, index: number) => (
                                 <Badge
                                   key={committee}
                                   variant="secondary"
@@ -256,7 +307,7 @@ export default function ParliamentariansPage() {
                             )}
                           </div>
                         </div>
-                        <div
+                        {/* <div
                           className="grid grid-cols-2 gap-4"
                           id={`dyfjlp_${index}`}
                         >
@@ -268,7 +319,7 @@ export default function ParliamentariansPage() {
                               className="text-2xl font-bold"
                               id={`ceyksf_${index}`}
                             >
-                              {member.details.bills}
+                              {member.bills}
                             </p>
                           </div>
                           <div id={`l7gta0_${index}`}>
@@ -279,10 +330,10 @@ export default function ParliamentariansPage() {
                               className="text-2xl font-bold"
                               id={`ectlp5_${index}`}
                             >
-                              {member.details.attendance}
+                              {member.attendance}
                             </p>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </CardContent>
