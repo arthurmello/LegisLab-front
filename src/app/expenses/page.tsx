@@ -22,12 +22,20 @@ import { BarChart, Bar, XAxis, CartesianGrid, YAxis, ResponsiveContainer } from 
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+// Define a type for the parliamentarian data
+type Parliamentarian = {
+  nome: string;
+  partido: string;
+  valor: number;
+  url_foto: string;
+};
+
 export default function ExpensesPage() {
   const [yearFilter, setYearFilter] = useState("2024");
   const [monthFilter, setMonthFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [expensesByCategory, setExpensesByCategory] = useState([]);
-  const [expensesByParliamentarian, setExpensesByParliamentarian] = useState([]);
+  const [expensesByParliamentarian, setExpensesByParliamentarian] = useState<Parliamentarian[]>([]);
   const [monthlyExpenses, setMonthlyExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
