@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -29,66 +29,88 @@ import {
 
 export default function PropositionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([
-    "Em tramitação",
-    "Em votação",
-    "Aprovado",
-  ]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([
-    "PEC",
-    "PL",
-    "PLP",
-  ]);
-  const [selectedThemes, setSelectedThemes] = useState<string[]>([
-    "Economia",
-    "Tecnologia",
-    "Administração Pública",
-    "Reforma",
-  ]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [expandedProposition, setExpandedProposition] = useState<string | null>(
     null,
   );
 
-  const statuses = ["Em tramitação", "Em votação", "Aprovado"];
-  const types = ["PEC", "PL", "PLP"];
-  const themes = ["Economia", "Tecnologia", "Administração Pública", "Reforma"];
+  const [propositions, setPropositions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const propositions = [
-    {
-      id: "PEC 45/2024 - Reforma Administrativa",
-      type: "PEC",
-      status: "Em tramitação",
-      date: "2024-03-14",
-      author: "Sen. Maria Santos",
-      summary:
-        "Proposta de Emenda à Constituição que altera dispositivos sobre a administração pública e estabelece novo regime de vínculos administrativos.",
-      themes: ["Administração Pública", "Reforma"],
-      details: {
-        mainPoints: [
-          "Reforma do sistema de carreiras",
-          "Novas regras para contratação",
-          "Mudanças no regime de estabilidade",
-        ],
+  const [statuses, setStatuses] = useState<string[]>([]);
+  const [types, setTypes] = useState<string[]>([]);
+  const [themes, setThemes] = useState<string[]>([]);
 
-        impact: "Alto impacto na estrutura administrativa federal",
-        nextSteps: "Em análise na CCJ",
-        relatedPropositions: ["PEC 32/2020", "PL 1789/2021"],
-      },
-    },
-    // ... other propositions
-  ];
+  useEffect(() => {
+    async function fetchPropositions() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/proposicoes`);
+        const data = await res.json();
+        console.log(data);
+        setPropositions(data);
+
+        // Extract unique types
+        const uniqueTypes = Array.from(new Set(data.map((prop: any) => prop.sigla_tipo)));
+        setTypes(uniqueTypes as string[]);
+        setSelectedTypes(uniqueTypes as string[]);
+
+        // Extract unique themes
+        const uniqueThemes = Array.from(new Set(data.flatMap((prop: any) => prop.temas)));
+        setThemes(uniqueThemes as string[]);
+        setSelectedThemes(uniqueThemes as string[]);
+
+        // Extract unique statuses
+        const uniqueStatuses = Array.from(new Set(data.map((prop: any) => prop.descricao_situacao)));
+        setStatuses(uniqueStatuses as string[]);
+        setSelectedStatuses(uniqueStatuses as string[]);
+
+      } catch (error) {
+        console.error("Error fetching proposicoes:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPropositions();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  // const propositions = [
+  //   {
+  //     id: "PEC 45/2024 - Reforma Administrativa",
+  //     type: "PEC",
+  //     descricao_situacao: "Em tramitação",
+  //     date: "2024-03-14",
+  //     author: "Sen. Maria Santos",
+  //     summary:
+  //       "Proposta de Emenda à Constituição que altera dispositivos sobre a administração pública e estabelece novo regime de vínculos administrativos.",
+  //     temas: ["Administração Pública", "Reforma"],
+  //     details: {
+  //       mainPoints: [
+  //         "Reforma do sistema de carreiras",
+  //         "Novas regras para contratação",
+  //         "Mudanças no regime de estabilidade",
+  //       ],
+
+  //       impact: "Alto impacto na estrutura administrativa federal",
+  //       nextSteps: "Em análise na CCJ",
+  //       relatedPropositions: ["PEC 32/2020", "PL 1789/2021"],
+  //     },
+  //   },
+  //   // ... other propositions
+  // ];
 
   const filteredPropositions = propositions.filter((prop) => {
-    const matchesSearch = prop.id
+    const matchesSearch = prop.nome
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesStatus =
-      selectedStatuses.length === 0 || selectedStatuses.includes(prop.status);
+      selectedStatuses.includes(prop.descricao_situacao);
     const matchesType =
-      selectedTypes.length === 0 || selectedTypes.includes(prop.type);
+      selectedTypes.includes(prop.sigla_tipo);
     const matchesTheme =
-      selectedThemes.length === 0 ||
-      prop.themes.some((theme) => selectedThemes.includes(theme));
+      prop.temas.some((tema: string) => selectedThemes.includes(tema));
 
     return matchesSearch && matchesStatus && matchesType && matchesTheme;
   });
@@ -122,30 +144,30 @@ export default function PropositionsPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 p-2">
-                {statuses.map((status, index) => (
+                {statuses.map((descricao_situacao, index) => (
                   <div
-                    key={status}
+                    key={descricao_situacao}
                     className="flex items-center space-x-2 p-2"
                     id={`oaud4p_${index}`}
                   >
                     <Checkbox
-                      id={status}
-                      checked={selectedStatuses.includes(status)}
+                      id={descricao_situacao}
+                      checked={selectedStatuses.includes(descricao_situacao)}
                       onCheckedChange={(checked) => {
                         setSelectedStatuses(
                           checked
-                            ? [...selectedStatuses, status]
-                            : selectedStatuses.filter((s) => s !== status),
+                            ? [...selectedStatuses, descricao_situacao]
+                            : selectedStatuses.filter((s) => s !== descricao_situacao),
                         );
                       }}
                     />
 
                     <label
-                      htmlFor={status}
+                      htmlFor={descricao_situacao}
                       className="text-sm font-medium"
                       id={`599qfc_${index}`}
                     >
-                      {status}
+                      {descricao_situacao}
                     </label>
                   </div>
                 ))}
@@ -162,30 +184,30 @@ export default function PropositionsPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 p-2">
-                {types.map((type, index) => (
+                {types.map((tipo, index) => (
                   <div
-                    key={type}
+                    key={tipo}
                     className="flex items-center space-x-2 p-2"
                     id={`77bnbe_${index}`}
                   >
                     <Checkbox
-                      id={type}
-                      checked={selectedTypes.includes(type)}
+                      id={tipo}
+                      checked={selectedTypes.includes(tipo)}
                       onCheckedChange={(checked) => {
                         setSelectedTypes(
                           checked
-                            ? [...selectedTypes, type]
-                            : selectedTypes.filter((t) => t !== type),
+                            ? [...selectedTypes, tipo]
+                            : selectedTypes.filter((t) => t !== tipo),
                         );
                       }}
                     />
 
                     <label
-                      htmlFor={type}
+                      htmlFor={tipo}
                       className="text-sm font-medium"
                       id={`g1joyp_${index}`}
                     >
-                      {type}
+                      {tipo}
                     </label>
                   </div>
                 ))}
@@ -202,30 +224,30 @@ export default function PropositionsPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 p-2">
-                {themes.map((theme, index) => (
+                {themes.map((tema, index) => (
                   <div
-                    key={theme}
+                    key={tema}
                     className="flex items-center space-x-2 p-2"
                     id={`mamlol_${index}`}
                   >
                     <Checkbox
-                      id={theme}
-                      checked={selectedThemes.includes(theme)}
+                      id={tema}
+                      checked={selectedThemes.includes(tema)}
                       onCheckedChange={(checked) => {
                         setSelectedThemes(
                           checked
-                            ? [...selectedThemes, theme]
-                            : selectedThemes.filter((t) => t !== theme),
+                            ? [...selectedThemes, tema]
+                            : selectedThemes.filter((t) => t !== tema),
                         );
                       }}
                     />
 
                     <label
-                      htmlFor={theme}
+                      htmlFor={tema}
                       className="text-sm font-medium"
                       id={`jsn7k7_${index}`}
                     >
-                      {theme}
+                      {tema}
                     </label>
                   </div>
                 ))}
@@ -267,31 +289,37 @@ export default function PropositionsPage() {
                             className="font-semibold"
                             id={`i7un22_${index}`}
                           >
-                            {proposition.id}
+                            {proposition.nome}
                           </span>
+                          <Badge id={`5imy14_${index}`}>
+                            {proposition.casa}
+                          </Badge>
                           <Badge
                             variant={
-                              proposition.status === "Aprovado"
+                              proposition.descricao_situacao === "Aprovado"
                                 ? "default"
-                                : proposition.status === "Em votação"
+                                : proposition.descricao_situacao === "Em votação"
                                   ? "secondary"
                                   : "outline"
                             }
                             id={`5imy14_${index}`}
                           >
-                            {proposition.status}
+                            {proposition.descricao_situacao}
                           </Badge>
+
+                          
+
                         </div>
                         <div
                           className="flex items-center space-x-2"
                           id={`liiulb_${index}`}
                         >
-                          <span
+                          {/* <span
                             className="text-sm text-muted-foreground"
                             id={`b6p37y_${index}`}
                           >
                             {new Date(proposition.date).toLocaleDateString()}
-                          </span>
+                          </span> */}
                           {expandedProposition === proposition.id ? (
                             <ChevronUpIcon
                               className="h-4 w-4"
@@ -315,9 +343,9 @@ export default function PropositionsPage() {
                         className="flex flex-wrap gap-2"
                         id={`f7p49n_${index}`}
                       >
-                        {proposition.themes.map((theme, themeIndex) => (
+                        {proposition.temas.map((tema: string, temaIndex: number) => (
                           <Badge
-                            key={themeIndex}
+                            key={temaIndex}
                             variant="outline"
                             className="flex items-center"
                             id={`tyhzjr_${index}`}
@@ -326,7 +354,7 @@ export default function PropositionsPage() {
                               className="h-3 w-3 mr-1"
                               id={`aodcu3_${index}`}
                             />
-                            {theme}
+                            {tema}
                           </Badge>
                         ))}
                       </div>
@@ -338,7 +366,7 @@ export default function PropositionsPage() {
                       id={`7exfuz_${index}`}
                     >
                       <div className="space-y-4" id={`lon68h_${index}`}>
-                        <div id={`cq3ztp_${index}`}>
+                        {/* <div id={`cq3ztp_${index}`}>
                           <h4
                             className="font-semibold mb-2"
                             id={`iy4ebz_${index}`}
@@ -350,14 +378,14 @@ export default function PropositionsPage() {
                             id={`qovdlx_${index}`}
                           >
                             {proposition.details.mainPoints.map(
-                              (point, pointIndex) => (
+                              (point: string, pointIndex: number) => (
                                 <li key={pointIndex} id={`1gzcvt_${index}`}>
                                   {point}
                                 </li>
                               ),
                             )}
                           </ul>
-                        </div>
+                        </div> */}
                         <div
                           className="grid grid-cols-2 gap-4"
                           id={`y7zn36_${index}`}
@@ -367,49 +395,53 @@ export default function PropositionsPage() {
                               className="font-semibold mb-2"
                               id={`w5b2sr_${index}`}
                             >
-                              Impacto
+                              Ementa
                             </h4>
                             <p className="text-sm" id={`wi3qb8_${index}`}>
-                              {proposition.details.impact}
+                              {proposition.ementa}
                             </p>
                           </div>
                           <div id={`j4tjdl_${index}`}>
-                            <h4
+                            {/* <h4
                               className="font-semibold mb-2"
                               id={`8rxt98_${index}`}
                             >
-                              Próximos Passos
+                              Próxima Etapa
                             </h4>
                             <p className="text-sm" id={`0nes3v_${index}`}>
-                              {proposition.details.nextSteps}
-                            </p>
+                              {proposition.ementa_detalhada}
+                            </p> */}
+                            <h4
+                              className="font-semibold mb-2 mt-4"
+                              id={`8rxt98_${index}`}
+                            >
+                              Autores
+                            </h4>
+                            <ul className="text-sm" id={`0nes3v_${index}`}>
+                              {proposition.autores.map((autor: { nome: string }, autorIndex: number) => (
+                                <li key={autorIndex}>{autor.nome}</li>
+                              ))}
+                            </ul>
                           </div>
                         </div>
-                        <div id={`ik343s_${index}`}>
-                          <h4
-                            className="font-semibold mb-2"
-                            id={`186rwi_${index}`}
-                          >
-                            Proposições Relacionadas
-                          </h4>
-                          <div
-                            className="flex flex-wrap gap-2"
-                            id={`kl38w4_${index}`}
-                          >
-                            {proposition.details.relatedPropositions.map(
-                              (related, relatedIndex) => (
-                                <Badge
-                                  key={relatedIndex}
-                                  variant="secondary"
-                                  className="cursor-pointer hover:bg-secondary/80"
-                                  id={`faf0co_${index}`}
-                                >
-                                  {related}
-                                </Badge>
-                              ),
-                            )}
+                        {proposition.uri && (
+                          <div id={`ik343s_${index}`}>
+                            <div className="flex items-center mb-2" id={`186rwi_${index}`}>
+                              <a
+                                href={proposition.uri}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                id={`faf0co_${index}`}
+                                className="flex items-center"
+                              >
+                                <FileTextIcon className="mr-2" />
+                                <h4 className="font-semibold" id={`186rwi_${index}`}>
+                                  Detalhes da Proposição
+                                </h4>
+                              </a>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </CardContent>
                   </CollapsibleContent>
