@@ -6,6 +6,7 @@ import { Banner } from "./(components)/banner";
 import { usePathname } from "next/navigation";
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast"; // ✅ Import Toaster
 
 // ✅ Utility function to check if sidebar should be hidden
 const shouldHideSidebar = (pathname: string) => {
@@ -41,10 +42,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <html lang="en">
         <title>LegisLab</title>
         <body>
+          {/* ✅ Global Toaster for toast notifications */}
+          <Toaster position="top-right" />
+
           <div className="flex flex-col h-screen bg-background">
             {!shouldHideHeader(pathname) && !isMobile && <Banner />}
             <div className="flex flex-1 overflow-hidden">
-              {/* ✅ Only show Sidebar if the page is NOT /home or /auth/* */}
               {!shouldHideSidebar(pathname) && <Sidebar />}
               <main className="flex-1 overflow-y-auto p-8">{children}</main>
             </div>

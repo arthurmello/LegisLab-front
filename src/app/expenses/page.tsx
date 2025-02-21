@@ -44,13 +44,11 @@ export default function ExpensesPage() {
       try {
         const categoryRes = await fetch(`${API_URL}/despesas/categoria`);
         const categoryData = await categoryRes.json();
-        console.log(categoryData);
         setExpensesByCategory(categoryData);
 
         const parliamentarianRes = await fetch(`${API_URL}/despesas/parlamentares`);
         const parliamentarianData = await parliamentarianRes.json();
         setExpensesByParliamentarian(parliamentarianData);
-        console.log(parliamentarianData);
 
         const monthlyRes = await fetch(`${API_URL}/despesas/total`);
         const monthlyData = await monthlyRes.json();

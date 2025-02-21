@@ -15,7 +15,6 @@ export default function AccountPage() {
   if (!user) return <p className="text-center mt-10 text-red-500">Erro ao carregar a conta.</p>;
 
   const isPaidUser = user.plan === "paid";
-  console.log("## User options", user.options);
 
   return (
     <div className="flex-1 space-y-6">

@@ -10,11 +10,13 @@ interface User {
     id: string;
     email?: string;
     plan: string; // ✅ Store user's plan
+    token?: string; // ✅ Add this
     options: {
         optinEmail: boolean;
         optinWhatsapp: boolean;
         keywords: string[];
         selectedTopics: string[];
+        telefone: string;
     };
 }
 
@@ -23,10 +25,12 @@ interface AuthContextProps {
     user: User | null;
     loading: boolean;
     signOut: () => void;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>; // ✅ Add this
 }
 
 // Create Auth Context
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
@@ -54,41 +58,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                setLoading(true);
-    
-                // ✅ Small delay to ensure session is available
-                await new Promise((resolve) => setTimeout(resolve, 500));
-    
-                const { data: { session }, error } = await supabase.auth.getSession();
-    
-                if (error || !session || !session.user) {
-                    console.warn("⚠️ No active session found.");
-                    setUser(null);
-                    setLoading(false);
-                    return;
-                }
-    
-                console.log("✅ Active session detected:", session);
-    
-                // Add token refresh check after getting session
-                if (session) {
-                    const refreshedSession = await refreshSession(session);
-                    if (refreshedSession && refreshedSession.user) {
-                        setUser({
-                            id: refreshedSession.user.id,
-                            email: refreshedSession.user.email ?? "",
-                            plan: refreshedSession.user.user_metadata?.plan || "free",
-                            options: refreshedSession.user.user_metadata?.options,
-                        });
-                    }
-                }
-            } catch (err) {
-                console.error("❌ Unexpected error in fetchUser:", err);
+              setLoading(true);
+          
+              const { data: { session }, error } = await supabase.auth.getSession();
+          
+              if (error || !session || !session.user) {
+                console.warn("⚠️ No active session found.");
                 setUser(null);
-            } finally {
                 setLoading(false);
+                return;
+              }
+          
+              console.log("✅ Active session detected:", session);
+          
+              const token = session.access_token;
+          
+              // ✅ Fetch latest options from backend
+              const fetchOptionsResponse = await fetch(`${API_URL}/conta/get-user-options`, {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+          
+              if (!fetchOptionsResponse.ok) {
+                throw new Error("Erro ao buscar opções do usuário.");
+              }
+          
+              const updatedOptionsRaw = await fetchOptionsResponse.json();
+              
+              const updatedOptions = {
+                optinEmail: updatedOptionsRaw.optin_email,
+                optinWhatsapp: updatedOptionsRaw.optin_whatsapp,
+                keywords: updatedOptionsRaw.keywords,
+                selectedTopics: updatedOptionsRaw.temas,
+                telefone: updatedOptionsRaw.telefone,
+              };
+              console.log("✅ Latest options from backend:", updatedOptions);
+          
+              // ✅ Update AuthContext with latest data
+              setUser({
+                id: session.user.id,
+                email: session.user.email ?? "",
+                plan: session.user.user_metadata?.plan || "free",
+                options: updatedOptions, // ✅ Use the latest options
+                token: token, // ✅ Keep the session token
+              });
+          
+            } catch (err) {
+              console.error("❌ Unexpected error in fetchUser:", err);
+              setUser(null);
+            } finally {
+              setLoading(false);
             }
-        };
+          };
     
         fetchUser();
     
@@ -112,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         email: refreshedSession.user.email ?? "",
                         plan: refreshedSession.user.user_metadata?.plan || "free",
                         options: refreshedSession.user.user_metadata?.options,
+                        token: refreshedSession.access_token,
                     });
                 }
             } else {
@@ -132,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, signOut }}>
+        <AuthContext.Provider value={{ user, loading, signOut, setUser }}>
             {children}
         </AuthContext.Provider>
     );
