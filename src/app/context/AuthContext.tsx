@@ -10,6 +10,12 @@ interface User {
     id: string;
     email?: string;
     plan: string; // ✅ Store user's plan
+    options: {
+        optinEmail: boolean;
+        optinWhatsapp: boolean;
+        keywords: string[];
+        selectedTopics: string[];
+    };
 }
 
 // Define Context Type
@@ -72,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                             id: refreshedSession.user.id,
                             email: refreshedSession.user.email ?? "",
                             plan: refreshedSession.user.user_metadata?.plan || "free",
+                            options: refreshedSession.user.user_metadata?.options,
                         });
                     }
                 }
@@ -104,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         id: refreshedSession.user.id,
                         email: refreshedSession.user.email ?? "",
                         plan: refreshedSession.user.user_metadata?.plan || "free",
+                        options: refreshedSession.user.user_metadata?.options,
                     });
                 }
             } else {

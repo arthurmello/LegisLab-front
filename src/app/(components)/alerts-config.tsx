@@ -15,7 +15,7 @@ export function AlertsConfig() {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [newKeyword, setNewKeyword] = useState("");
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-
+  const [phoneNumber, setPhoneNumber] = useState("");
   const topics = [
     "Saúde",
     "Educação",
@@ -79,6 +79,19 @@ export function AlertsConfig() {
                 WhatsApp
               </Label>
             </div>
+          </div>
+          <div className="flex space-x-2">
+            <Label
+              htmlFor="whatsapp"
+              className="flex items-center gap-2"
+            >
+              <MessageSquareIcon className="h-4 w-4" />
+            </Label>
+            <Input
+              placeholder="Telefone (WhatsApp)"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
           </div>
         </div>
 

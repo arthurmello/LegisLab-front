@@ -49,7 +49,6 @@ export function Sidebar() {
     { label: "Proposições", icon: FileTextIcon, href: "/propositions" },
     { label: "Votações", icon: VoteIcon, href: "/votes" },
     { label: "Gastos", icon: WalletCardsIcon, href: "/expenses" },
-    { label: "Alertas", icon: BellIcon, href: "/alerts" },
     { label: "Minha Conta", icon: UserIcon, href: "/account" },
   ];
 
