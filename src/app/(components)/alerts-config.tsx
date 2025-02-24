@@ -31,6 +31,7 @@ export function AlertsConfig() {
   const topics = [
     "Saúde", "Educação", "Economia", "Meio Ambiente", "Segurança",
     "Tecnologia", "Trabalho", "Direitos Humanos", "Infraestrutura", "Tributação",
+    "Todos"
   ];
 
   const handleAddKeyword = () => {

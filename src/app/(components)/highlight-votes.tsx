@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,72 +10,41 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useAuth } from "@/app/context/AuthContext";
+
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export function HighlightVotes() {
+  const { user } = useAuth();
+  const [keywords, setKeywords] = useState<string[]>(user?.options?.keywords || []);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>(user?.options?.selectedTopics || []);
+  const [votes, setVotes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [expandedVote, setExpandedVote] = useState<string | null>(null);
 
-  const votes = [
-    {
-      id: "PEC 45/2024",
-      title: "Reforma Administrativa",
-      result: "Aprovado",
-      votes: { favor: 308, against: 114, abstain: 91 },
-      date: "2024-03-14",
-      details: {
-        summary:
-          "Proposta de Emenda à Constituição que altera dispositivos sobre a administração pública.",
-        mainPoints: [
-          "Reforma do sistema de carreiras do serviço público",
-          "Novas regras para contratação de servidores",
-          "Mudanças no regime de estabilidade",
-        ],
+  useEffect(() => {
+    async function fetchVotes() {
+      try {
+        const queryParams = new URLSearchParams();
+        selectedTopics.forEach(topic => queryParams.append('temas', topic));
+        keywords.forEach(keyword => queryParams.append('palavras_chave', keyword));
 
-        impact: "Alto impacto na estrutura administrativa federal",
-        nextSteps: "Segue para promulgação",
-      },
-    },
-    {
-      id: "PL 1234/2024",
-      title: "Alteração na Lei de Diretrizes Orçamentárias",
-      result: "Em votação",
-      votes: { favor: 245, against: 187, abstain: 45 },
-      date: "2024-03-15",
-      details: {
-        summary:
-          "Projeto que modifica parâmetros da LDO para o próximo ano fiscal.",
-        mainPoints: [
-          "Revisão das metas fiscais",
-          "Ajuste nos critérios de contingenciamento",
-          "Novas regras para emendas parlamentares",
-        ],
+        const response = await fetch(`${API_URL}/votacoes/?${queryParams.toString()}`);
+        const data = await response.json();
+        setVotes(data);
+      } catch (error) {
+        console.error("Error fetching votes:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchVotes();
+  }, [selectedTopics, keywords]);
 
-        impact: "Médio impacto no planejamento orçamentário",
-        nextSteps: "Em discussão no plenário",
-      },
-    },
-    {
-      id: "PLP 789/2024",
-      title: "Regulamentação do Mercado de Criptomoedas",
-      result: "Aprovado",
-      votes: { favor: 267, against: 148, abstain: 63 },
-      date: "2024-03-13",
-      details: {
-        summary:
-          "Lei Complementar que estabelece marco regulatório para criptoativos.",
-        mainPoints: [
-          "Definição do conceito legal de criptomoedas",
-          "Regras para exchanges e corretoras",
-          "Medidas de proteção ao investidor",
-        ],
-
-        impact: "Alto impacto no mercado financeiro",
-        nextSteps: "Aguarda sanção presidencial",
-      },
-    },
-  ];
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <Card>
+    <Card className="h-full flex-grow">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <VoteIcon className="h-5 w-5" />
@@ -83,7 +52,7 @@ export function HighlightVotes() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea className="h-[50rem] pr-4 md:h-[40rem] sm:h-[30rem]">
           <div className="space-y-4">
             {votes.map((vote, index) => (
               <Collapsible
@@ -105,41 +74,24 @@ export function HighlightVotes() {
                         id={`y4i9lg_${index}`}
                       >
                         <span className="font-semibold" id={`ohyu48_${index}`}>
-                          {vote.id}
+                          {vote.nome}
                         </span>
                         <Badge
                           variant={
-                            vote.result === "Aprovado"
-                            ? "default" // or "secondary", "destructive", etc.
-                            : vote.result === "Em votação"
+                            vote.aprovacao === 1
+                            ? "default"
+                            : vote.aprovacao === 0
                             ? "secondary"
                             : "outline"
                           }
                           id={`gjt85a_${index}`}
                         >
-                          {vote.result}
+                          {vote.aprovacao === 1 ? "Aprovado" : "Rejeitado"}
                         </Badge>
                       </div>
                       <p className="text-sm mb-3" id={`zkxbe8_${index}`}>
-                        {vote.title}
+                        {vote.ementa}
                       </p>
-                      <div
-                        className="grid grid-cols-3 gap-2 text-sm"
-                        id={`8aubd6_${index}`}
-                      >
-                        <div className="text-green-600" id={`ic1f1v_${index}`}>
-                          A favor: {vote.votes.favor}
-                        </div>
-                        <div className="text-red-600" id={`n6o6hi_${index}`}>
-                          Contra: {vote.votes.against}
-                        </div>
-                        <div
-                          className="text-muted-foreground"
-                          id={`38clwr_${index}`}
-                        >
-                          Abstenção: {vote.votes.abstain}
-                        </div>
-                      </div>
                       <div
                         className="flex justify-between items-center mt-2"
                         id={`k1qd82_${index}`}
@@ -148,7 +100,7 @@ export function HighlightVotes() {
                           className="text-sm text-muted-foreground"
                           id={`rd8ofb_${index}`}
                         >
-                          {new Date(vote.date).toLocaleDateString()}
+                          {new Date(vote.data).toLocaleDateString()}
                         </span>
                         {expandedVote === vote.id ? (
                           <ChevronUpIcon
@@ -175,56 +127,11 @@ export function HighlightVotes() {
                             className="font-semibold mb-2"
                             id={`aek8hg_${index}`}
                           >
-                            Resumo
+                            Resultado
                           </h4>
                           <p className="text-sm" id={`0445wx_${index}`}>
-                            {vote.details.summary}
+                            {vote.descricao}
                           </p>
-                        </div>
-                        <div id={`846uzo_${index}`}>
-                          <h4
-                            className="font-semibold mb-2"
-                            id={`7iliy7_${index}`}
-                          >
-                            Pontos Principais
-                          </h4>
-                          <ul
-                            className="list-disc list-inside text-sm space-y-1"
-                            id={`cubcg4_${index}`}
-                          >
-                            {vote.details.mainPoints.map((point, index) => (
-                              <li key={index} id={`7x2sdf_${index}`}>
-                                {point}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div
-                          className="grid grid-cols-2 gap-4"
-                          id={`4752mj_${index}`}
-                        >
-                          <div id={`rbtj24_${index}`}>
-                            <h4
-                              className="font-semibold mb-2"
-                              id={`l8j1zo_${index}`}
-                            >
-                              Impacto
-                            </h4>
-                            <p className="text-sm" id={`27cxvf_${index}`}>
-                              {vote.details.impact}
-                            </p>
-                          </div>
-                          <div id={`xfh9ng_${index}`}>
-                            <h4
-                              className="font-semibold mb-2"
-                              id={`g2kvft_${index}`}
-                            >
-                              Próximos Passos
-                            </h4>
-                            <p className="text-sm" id={`89uxpv_${index}`}>
-                              {vote.details.nextSteps}
-                            </p>
-                          </div>
                         </div>
                       </div>
                     </CardContent>
