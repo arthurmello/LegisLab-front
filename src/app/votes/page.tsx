@@ -32,7 +32,7 @@ export default function VotesPage() {
   useEffect(() => {
     async function fetchVotes() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/votacoes`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/votacoes/`);
         const data = await res.json();
 
         // Process the votes to categorize them

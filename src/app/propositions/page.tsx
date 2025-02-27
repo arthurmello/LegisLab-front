@@ -46,7 +46,7 @@ export default function PropositionsPage() {
   useEffect(() => {
     async function fetchPropositions() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/proposicoes`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/proposicoes/`);
         const data = await res.json();
         console.log(data);
         setPropositions(data);
