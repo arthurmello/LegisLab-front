@@ -31,7 +31,7 @@ export function HighlightVotes() {
 
         const response = await fetch(`${API_URL}/votacoes/?${queryParams.toString()}`);
         const data = await response.json();
-        setVotes(data);
+        setVotes(data.slice(0, 10));
       } catch (error) {
         console.error("Error fetching votes:", error);
       } finally {
@@ -48,7 +48,7 @@ export function HighlightVotes() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <VoteIcon className="h-5 w-5" />
-          Votações em Destaque
+          Votações recentes
         </CardTitle>
       </CardHeader>
       <CardContent>

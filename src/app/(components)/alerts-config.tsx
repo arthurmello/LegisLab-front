@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,11 +22,36 @@ export function AlertsConfig() {
   const token = user?.token;
   const [keywords, setKeywords] = useState<string[]>(user?.options?.keywords || []);
   const [newKeyword, setNewKeyword] = useState("");
-  const [selectedTopics, setSelectedTopics] = useState<string[]>(user?.options?.selectedTopics || []);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [phoneNumber, setPhoneNumber] = useState(user?.options?.telefone || "");
   const [emailNotifications, setEmailNotifications] = useState<boolean>(user?.options?.optinEmail || false);
   const [whatsappNotifications, setWhatsappNotifications] = useState<boolean>(user?.options?.optinWhatsapp || false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUserOptions = async () => {
+      try {
+        const fetchOptionsResponse = await fetch(`${API_URL}/conta/get-user-options`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (fetchOptionsResponse.ok) {
+          const updatedOptionsRaw = await fetchOptionsResponse.json();
+          setSelectedTopics(updatedOptionsRaw.temas || []);
+        } else {
+          toast.error("Erro ao buscar novas configurações.");
+        }
+      } catch (error) {
+        console.error("Error fetching user options:", error);
+        toast.error("Erro ao buscar novas configurações.");
+      }
+    };
+
+    fetchUserOptions();
+  }, [token]);
 
   const topics = [
     "Saúde", "Educação", "Economia", "Meio Ambiente", "Segurança",
