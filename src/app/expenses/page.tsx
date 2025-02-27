@@ -48,7 +48,8 @@ export default function ExpensesPage() {
 
         const parliamentarianRes = await fetch(`${API_URL}/despesas/parlamentares`);
         const parliamentarianData = await parliamentarianRes.json();
-        setExpensesByParliamentarian(parliamentarianData);
+        const sortedParliamentarianData = parliamentarianData.sort((a: Parliamentarian, b: Parliamentarian) => b.valor - a.valor);
+        setExpensesByParliamentarian(sortedParliamentarianData);
 
         const monthlyRes = await fetch(`${API_URL}/despesas/total`);
         const monthlyData = await monthlyRes.json();
