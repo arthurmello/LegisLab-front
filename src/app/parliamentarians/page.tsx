@@ -38,6 +38,7 @@ export default function ParliamentariansPage() {
   useEffect(() => {
     async function fetchParliamentarians() {
       try {
+        console.log(API_URL);
         const res = await fetch(`${API_URL}/parlamentares`);
         const data = await res.json();
         console.log(data);
