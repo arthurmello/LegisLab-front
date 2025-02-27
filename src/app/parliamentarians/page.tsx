@@ -35,10 +35,10 @@ export default function ParliamentariansPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedMember, setExpandedMember] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  console.log(`${API_URL}/parlamentares/`);
   useEffect(() => {
     async function fetchParliamentarians() {
       try {
-        console.log(API_URL);
         const res = await fetch(`${API_URL}/parlamentares/`);
         const data = await res.json();
         console.log(data);
