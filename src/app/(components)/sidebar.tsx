@@ -107,7 +107,7 @@ export function Sidebar() {
           </div>
         </div>
         <div className="mt-auto px-3 py-2">
-          <Link
+          {/* <Link
             href="/help" // ✅ Corrected href
             className="flex items-center p-3 text-sm font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition whitespace-nowrap"
           >
@@ -120,7 +120,7 @@ export function Sidebar() {
             >
               Ajuda
             </span>
-          </Link>
+          </Link> */}
           <Button
             variant="ghost"
             className="w-full mt-2 justify-start"

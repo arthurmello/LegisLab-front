@@ -28,7 +28,8 @@ import {
 } from "@/components/ui/collapsible";
 
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+// const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_URL = "https://legislab-back-production.up.railway.app"
 console.log(`${API_URL}/parlamentares/`);
 
 export default function ParliamentariansPage() {
