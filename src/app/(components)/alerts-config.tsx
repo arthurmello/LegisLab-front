@@ -26,7 +26,7 @@ export function AlertsConfig() {
   const [phoneNumber, setPhoneNumber] = useState(user?.options?.telefone || "");
   const [emailNotifications, setEmailNotifications] = useState<boolean>(user?.options?.optinEmail || false);
   const [whatsappNotifications, setWhatsappNotifications] = useState<boolean>(user?.options?.optinWhatsapp || false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserOptions = async () => {
@@ -47,6 +47,8 @@ export function AlertsConfig() {
       } catch (error) {
         console.error("Error fetching user options:", error);
         toast.error("Erro ao buscar novas configurações.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -150,6 +152,8 @@ export function AlertsConfig() {
       setLoading(false);
     }
   };
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <Card>
