@@ -39,7 +39,7 @@ export default function ParliamentariansPage() {
     async function fetchParliamentarians() {
       try {
         console.log(API_URL);
-        const res = await fetch(`${API_URL}/parlamentares`);
+        const res = await fetch(`${API_URL}/parlamentares/`);
         const data = await res.json();
         console.log(data);
         setParliamentarians(data);
