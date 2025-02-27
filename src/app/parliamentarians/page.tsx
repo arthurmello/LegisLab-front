@@ -29,13 +29,14 @@ import {
 
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+console.log(`${API_URL}/parlamentares/`);
 
 export default function ParliamentariansPage() {
   const [parliamentarians, setParliamentarians] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedMember, setExpandedMember] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  console.log(`${API_URL}/parlamentares/`);
+  
   useEffect(() => {
     async function fetchParliamentarians() {
       try {
