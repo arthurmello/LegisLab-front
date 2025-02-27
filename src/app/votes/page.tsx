@@ -222,11 +222,9 @@ export default function VotesPage() {
                       </div>
                       <div id={`z1a4um_${index}`}>
                         <h4 className="font-semibold mb-2" id={`6f14zb_${index}`}>Pontos Principais</h4>
-                        <ul className="list-disc list-inside text-sm space-y-1" id={`vz1fju_${index}`}>
-                          {vote.ementa.split('.').map((point: string, index: number) => (
-                            <li key={index} id={`k0y02p_${index}`}>{point}</li>
-                          ))}
-                        </ul>
+                        <p className="text-sm space-y-1" id={`vz1fju_${index}`}>
+                          {vote.ementa}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
