@@ -11,9 +11,9 @@ export default function HomePage() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        router.push("/home"); // ✅ Redirect to dashboard if logged in
+        router.push("/dashboard"); // ✅ Redirect to dashboard if logged in
       } else {
-        router.push("/auth"); // ✅ Redirect to auth page if not logged in
+        router.push("/home"); // ✅ Redirect to auth page if not logged in
       }
     }
   }, [user, loading, router]);
