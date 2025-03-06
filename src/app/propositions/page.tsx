@@ -26,8 +26,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { withAuth } from "../hoc/withAuth";
 
-export default function PropositionsPage() {
+function PropositionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -454,3 +455,5 @@ export default function PropositionsPage() {
     </div>
   );
 }
+
+export default withAuth(PropositionsPage);

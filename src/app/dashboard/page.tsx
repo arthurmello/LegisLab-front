@@ -5,8 +5,9 @@ import { RecentBills } from "../(components)/recent-bills";
 import { RecentAlerts } from "../(components)/recent-alerts";
 import { HighlightVotes } from "../(components)/highlight-votes";
 import { ActivityIcon } from "lucide-react";
+import { withAuth } from "../hoc/withAuth";
 
-export default function Dashboard() {
+function DashboardPage() {
   return (
     <div className="flex-1 space-y-6 h-screen">
       <div className="flex items-center justify-end">
@@ -25,3 +26,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export default withAuth(DashboardPage);

@@ -26,11 +26,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { withAuth } from "../hoc/withAuth";
 
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-export default function ParliamentariansPage() {
+function ParliamentariansPage() {
   const [parliamentarians, setParliamentarians] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedMember, setExpandedMember] = useState<number | null>(null);
@@ -347,3 +348,5 @@ export default function ParliamentariansPage() {
     </div>
   );
 }
+
+export default withAuth(ParliamentariansPage);

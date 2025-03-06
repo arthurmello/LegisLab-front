@@ -19,6 +19,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { WalletIcon, SearchIcon } from "lucide-react";
 import { BarChart, Bar, XAxis, CartesianGrid, YAxis, ResponsiveContainer } from "recharts";
+import { withAuth } from "../hoc/withAuth";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -30,7 +31,7 @@ type Parliamentarian = {
   url_foto: string;
 };
 
-export default function ExpensesPage() {
+function ExpensesPage() {
   const [yearFilter, setYearFilter] = useState("2024");
   const [monthFilter, setMonthFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -152,3 +153,5 @@ export default function ExpensesPage() {
     </div>
   );
 }
+
+export default withAuth(ExpensesPage);

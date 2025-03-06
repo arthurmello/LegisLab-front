@@ -23,8 +23,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { withAuth } from "../hoc/withAuth";
 
-export default function VotesPage() {
+function VotesPage() {
   const [expandedVote, setExpandedVote] = useState<string | null>(null);
   const [votes, setVotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -237,3 +238,5 @@ export default function VotesPage() {
     </div>
   );
 }
+
+export default withAuth(VotesPage);

@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./context/AuthContext";
+import { withAuth } from "./hoc/withAuth";
 
-export default function HomePage() {
+function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -20,3 +21,5 @@ export default function HomePage() {
 
   return <p>Loading...</p>; // Show a loading state while checking auth
 }
+
+export default withAuth(HomePage);

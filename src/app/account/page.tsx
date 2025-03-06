@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StarIcon, CrownIcon, ArrowUpIcon, CheckCircleIcon } from "lucide-react";
 import { AlertsConfig } from "../(components)/alerts-config";
+import { withAuth } from "../hoc/withAuth";
 
-export default function AccountPage() {
+function AccountPage() {
   const { user, signOut, loading } = useAuth();
 
   if (loading) return <p className="text-center mt-10">Carregando...</p>;
@@ -22,3 +23,5 @@ export default function AccountPage() {
     </div>
   );
 }
+
+export default withAuth(AccountPage);
