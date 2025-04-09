@@ -174,7 +174,9 @@ export function AlertsConfig() {
                 Email
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            {/* -- WhatsApp notifications are disabled for now -- */}
+            {/* <div className="flex items-center space-x-2">
+              
               <Checkbox 
                 checked={whatsappNotifications} 
                 onCheckedChange={(checked) => setWhatsappNotifications(!!checked)} 
@@ -183,9 +185,10 @@ export function AlertsConfig() {
                 <MessageSquareIcon className="h-4 w-4" />
                 WhatsApp
               </Label>
-            </div>
+            </div> */}
           </div>
-          <div className="flex space-x-2">
+          {/* -- WhatsApp notifications are disabled for now -- */}
+          {/* <div className="flex space-x-2">
             <Label className="flex items-center gap-2">
               <MessageSquareIcon className="h-4 w-4" />
             </Label>
@@ -194,7 +197,7 @@ export function AlertsConfig() {
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
-          </div>
+          </div> */}
         </div>
 
         <Separator className="my-4" />
