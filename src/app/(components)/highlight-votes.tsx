@@ -100,7 +100,7 @@ export function HighlightVotes() {
                           className="text-sm text-muted-foreground"
                           id={`rd8ofb_${index}`}
                         >
-                          {new Date(vote.data).toLocaleDateString()}
+                          {new Date(vote.data).toLocaleDateString('pt-BR')}
                         </span>
                         {expandedVote === vote.id ? (
                           <ChevronUpIcon

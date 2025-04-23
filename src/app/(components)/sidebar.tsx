@@ -48,7 +48,7 @@ export function Sidebar() {
     { label: "Parlamentares", icon: Users2Icon, href: "/parliamentarians" },
     { label: "Proposições", icon: FileTextIcon, href: "/propositions" },
     { label: "Votações", icon: VoteIcon, href: "/votes" },
-    { label: "Gastos", icon: WalletCardsIcon, href: "/expenses" },
+    // { label: "Gastos", icon: WalletCardsIcon, href: "/expenses" },
     { label: "Minha Conta", icon: UserIcon, href: "/account" },
   ];
 

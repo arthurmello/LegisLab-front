@@ -319,7 +319,7 @@ function PropositionsPage() {
                             className="text-sm text-muted-foreground"
                             id={`b6p37y_${index}`}
                           >
-                            {new Date(proposition.date).toLocaleDateString()}
+                            {new Date(proposition.date).toLocaleDateString('pt-BR')}
                           </span> */}
                           {expandedProposition === proposition.id ? (
                             <ChevronUpIcon

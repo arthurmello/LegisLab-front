@@ -86,7 +86,7 @@ export function RecentBills() {
                   <UserIcon className="h-4 w-4 mr-1" id={`lm8gty_${index}`} />
                   {proposicao.autores[0]?.nome}
                   <span className="ml-auto" id={`508dju_${index}`}>
-                    {new Date(proposicao.created_at).toLocaleDateString()}
+                    {new Date(proposicao.created_at).toLocaleDateString('pt-BR')}
                   </span>
                 </div>
               </div>

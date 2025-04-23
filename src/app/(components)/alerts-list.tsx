@@ -76,7 +76,7 @@ export function AlertsList() {
                       className="text-sm text-muted-foreground"
                       id={`lpgo7w_${index}`}
                     >
-                      {new Date(alert.date).toLocaleDateString()}
+                      {new Date(alert.date).toLocaleDateString('pt-BR')}
                     </span>
                   </div>
                   <div className="space-y-2" id={`m0g942_${index}`}>

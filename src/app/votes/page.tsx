@@ -136,7 +136,7 @@ function VotesPage() {
         <div className="flex items-center space-x-2">
           <ActivityIcon className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
-            Última atualização: {new Date().toLocaleDateString()}
+            Última atualização: {new Date().toLocaleDateString('pt-BR')}
           </span>
         </div>
       </div>
@@ -174,7 +174,7 @@ function VotesPage() {
                         </Badge>
                       </div>
                       <span className="text-sm text-muted-foreground" id={`85vaws_${index}`}>
-                        {new Date(vote.data).toLocaleDateString()}
+                        {new Date(vote.data).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
 
