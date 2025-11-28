@@ -44,21 +44,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <body>
           {/* ✅ Global Toaster for toast notifications */}
           <Toaster position="top-right" />
-          <div className="flex flex-col h-screen bg-background items-center justify-center">
-            <div className="flex flex-col items-center">
-              <span className="text-4xl mb-4">🔧</span> {/* Small icon added */}
-              <main className="flex-1 overflow-y-auto p-8 text-center">
-                Em manutenção
-              </main>
-            </div>
-          </div>
-          {/* <div className="flex flex-col h-screen bg-background">
+
+          <div className="flex flex-col h-screen bg-background">
             {!shouldHideHeader(pathname) && !isMobile && <Banner />}
             <div className="flex flex-1 overflow-hidden">
               {!shouldHideSidebar(pathname) && <Sidebar />}
               <main className="flex-1 overflow-y-auto p-8">{children}</main>
             </div>
-          </div> */}
+          </div>
         </body>
       </html>
     </AuthProvider>
