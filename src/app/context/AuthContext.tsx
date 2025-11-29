@@ -1,9 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { Session } from "@supabase/supabase-js";
 
 // Define User Type
 interface User {
@@ -32,125 +30,132 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+// Helper function to decode JWT token
+const decodeJWT = (token: string) => {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error("Error decoding JWT:", error);
+        return null;
+    }
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    // Add refresh token function
-    const refreshSession = async (session: Session) => {
-        const expiryTime = new Date(session.expires_at! * 1000);
-        const timeUntilExpiry = expiryTime.getTime() - Date.now();
-        
-        // Refresh if token expires in less than 60 seconds
-        if (timeUntilExpiry < 60000) {
-            console.log("🔄 Refreshing session token...");
-            const { data: { session: newSession }, error } = await supabase.auth.refreshSession();
-            if (error) {
-                console.error("❌ Error refreshing token:", error);
-                return null;
-            }
-            return newSession;
-        }
-        return session;
-    };
-
     useEffect(() => {
         const fetchUser = async () => {
             try {
-              setLoading(true);
-          
-              const { data: { session }, error } = await supabase.auth.getSession();
-          
-              if (error || !session || !session.user) {
-                console.warn("⚠️ No active session found.");
-                setUser(null);
-                setLoading(false);
-                return;
-              }
-          
-              console.log("✅ Active session detected:", session);
-          
-              const token = session.access_token;
-          
-              // ✅ Fetch latest options from backend
-              const fetchOptionsResponse = await fetch(`${API_URL}/conta/get-user-options`, {
-                method: "GET",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-          
-              if (!fetchOptionsResponse.ok) {
-                throw new Error("Erro ao buscar opções do usuário.");
-              }
-          
-              const updatedOptionsRaw = await fetchOptionsResponse.json();
-              
-              const updatedOptions = {
-                optinEmail: updatedOptionsRaw.optin_email,
-                optinWhatsapp: updatedOptionsRaw.optin_whatsapp,
-                keywords: updatedOptionsRaw.keywords,
-                selectedTopics: updatedOptionsRaw.temas,
-                telefone: updatedOptionsRaw.telefone,
-              };
-              console.log("✅ Latest options from backend:", updatedOptions);
-          
-              // ✅ Update AuthContext with latest data
-              setUser({
-                id: session.user.id,
-                email: session.user.email ?? "",
-                plan: session.user.user_metadata?.plan || "free",
-                options: updatedOptions, // ✅ Use the latest options
-                token: token, // ✅ Keep the session token
-              });
-          
-            } catch (err) {
-              console.error("❌ Unexpected error in fetchUser:", err);
-              setUser(null);
-            } finally {
-              setLoading(false);
-            }
-          };
-    
-        fetchUser();
-    
-        // Set up periodic token refresh
-        const refreshInterval = setInterval(async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                await refreshSession(session);
-            }
-        }, 50000); // Check every 50 seconds
-    
-        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log(`🔄 Auth event: ${event}`, session);
-            
-            if (session?.user) {
-                // Refresh token if needed before setting user
-                const refreshedSession = await refreshSession(session);
-                if (refreshedSession) {
-                    setUser({
-                        id: refreshedSession.user.id,
-                        email: refreshedSession.user.email ?? "",
-                        plan: refreshedSession.user.user_metadata?.plan || "free",
-                        options: refreshedSession.user.user_metadata?.options,
-                        token: refreshedSession.access_token,
-                    });
+                setLoading(true);
+                
+                const token = localStorage.getItem("access_token");
+                
+                if (!token) {
+                    console.warn("⚠️ No access token found.");
+                    setUser(null);
+                    setLoading(false);
+                    return;
                 }
-            } else {
+                
+                // Decode JWT to get user info
+                const decoded = decodeJWT(token);
+                if (!decoded) {
+                    console.warn("⚠️ Invalid token.");
+                    localStorage.removeItem("access_token");
+                    localStorage.removeItem("refresh_token");
+                    setUser(null);
+                    setLoading(false);
+                    return;
+                }
+                
+                console.log("✅ Token found, fetching user data...");
+                
+                // Fetch user options from backend
+                const fetchOptionsResponse = await fetch(`${API_URL}/conta/get-user-options`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                
+                if (!fetchOptionsResponse.ok) {
+                    if (fetchOptionsResponse.status === 401) {
+                        // Token expired or invalid
+                        localStorage.removeItem("access_token");
+                        localStorage.removeItem("refresh_token");
+                        setUser(null);
+                        setLoading(false);
+                        return;
+                    }
+                    throw new Error("Erro ao buscar opções do usuário.");
+                }
+                
+                const updatedOptionsRaw = await fetchOptionsResponse.json();
+                
+                const updatedOptions = {
+                    optinEmail: updatedOptionsRaw.optin_email || false,
+                    optinWhatsapp: updatedOptionsRaw.optin_whatsapp || false,
+                    keywords: updatedOptionsRaw.keywords || [],
+                    selectedTopics: updatedOptionsRaw.temas || [],
+                    telefone: updatedOptionsRaw.telefone || "",
+                };
+                
+                console.log("✅ User data loaded:", { id: decoded.sub || decoded.user_id, email: decoded.email });
+                
+                // Update AuthContext with user data
+                setUser({
+                    id: decoded.sub || decoded.user_id || "",
+                    email: decoded.email || "",
+                    plan: decoded.plan || "free",
+                    options: updatedOptions,
+                    token: token,
+                });
+                
+            } catch (err) {
+                console.error("❌ Unexpected error in fetchUser:", err);
                 setUser(null);
+            } finally {
+                setLoading(false);
             }
-        });
-    
+        };
+        
+        fetchUser();
+        
+        // Listen for storage changes (e.g., when token is set in another tab/window)
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === "access_token") {
+                fetchUser();
+            }
+        };
+        
+        window.addEventListener("storage", handleStorageChange);
+        
+        // Also listen for custom event when token is set in same window
+        const handleTokenSet = () => {
+            fetchUser();
+        };
+        
+        window.addEventListener("tokenSet", handleTokenSet);
+        
         return () => {
-            authListener.subscription.unsubscribe();
-            clearInterval(refreshInterval);
+            window.removeEventListener("storage", handleStorageChange);
+            window.removeEventListener("tokenSet", handleTokenSet);
         };
     }, []);
 
     const signOut = async () => {
-        await supabase.auth.signOut();
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
         setUser(null);
         router.push("/auth");
     };

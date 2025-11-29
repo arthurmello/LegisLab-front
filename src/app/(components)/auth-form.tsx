@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -45,12 +44,11 @@ export function AuthForm() {
 
     if (isLogin) {
       localStorage.setItem("access_token", data.access_token);
-      
-      const { data: sessionError } = await supabase.auth.setSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-      });
-    
+      if (data.refresh_token) {
+        localStorage.setItem("refresh_token", data.refresh_token);
+      }
+      // Dispatch event to notify AuthContext that token was set
+      window.dispatchEvent(new Event("tokenSet"));
       router.push("/dashboard");
     } else {
       setSuccessMessage("Verifique sua caixa de entrada para confirmar seu cadastro.");
